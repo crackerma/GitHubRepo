@@ -1,0 +1,53 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using NUnit.Framework;
+using System.ServiceModel;
+using CPT.WebAPI.Tests.WebServiceClient;
+
+namespace CPT.WebAPI.Tests
+{
+    [TestFixture]
+    public class ClientUnitTests
+    {
+        /// <summary>
+        /// Unit Test 3: Client Application retrieves correct Product Record
+        /// </summary>
+        [Test]
+        public void ProductRecord()
+        {
+            PublicServiceClient service = new PublicServiceClient("BasicHttpBinding_IPublicService");
+            Assert.AreEqual(service.GetProduct("9300675020923").ProductID, "9300675020923");
+        }
+
+        /// <summary>
+        /// Unit Test 4: Client Application correctly handles 'no record found' web service response
+        /// </summary>
+        [Test]
+        public void WebServiceResponse()
+        {
+            PublicServiceClient service = new PublicServiceClient("BasicHttpBinding_IPublicService");
+
+            Assert.IsNull(service.GetProduct("0000000000000"));
+        }
+
+        /// <summary>
+        /// Unit Test 7: Client correctly handles no internet access
+        /// </summary>
+        [Test]
+        public void LossOfInternetAccess()
+        {
+            PublicServiceClient fake = new PublicServiceClient("BasicHttpBinding_IPublicService_Fake");
+            Assert.Catch(typeof(EndpointNotFoundException), delegate
+            {
+                fake.GetProduct(String.Empty);
+            });
+            PublicServiceClient real = new PublicServiceClient("BasicHttpBinding_IPublicService");
+            Assert.DoesNotThrow(delegate
+            {
+                real.GetProduct(String.Empty);
+            });
+        }
+    }
+}

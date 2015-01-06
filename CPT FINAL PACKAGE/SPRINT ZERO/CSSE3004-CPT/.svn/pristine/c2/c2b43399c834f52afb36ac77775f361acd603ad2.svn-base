@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.ServiceModel;
+using System.Text;
+using CPT.WebAPI.Contract.Data;
+
+namespace CPT.WebAPI.Contract
+{
+    /// <summary>
+    /// The interface that defines all public api functions
+    /// </summary>
+    [ServiceContract]
+    public interface IPublicService
+    {
+        [OperationContract]
+        Product GetProduct(string barcode);
+
+        [OperationContract]
+        IEnumerable<Product> GetProducts(string[] barcodes);
+
+        [OperationContract]
+        IEnumerable<Review> GetReviews(string productid);
+
+        [OperationContract]
+        string AddReview(string productid, Review review);
+    }
+}

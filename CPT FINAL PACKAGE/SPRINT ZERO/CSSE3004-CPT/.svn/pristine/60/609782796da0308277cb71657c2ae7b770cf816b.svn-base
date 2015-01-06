@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" xmlns:tns="http://schemas.datacontract.org/2004/07/CPT.WebAPI.Contract.Data" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/CPT.WebAPI.Contract.Data" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://cpt.cerdata.sg/PublicAPI.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:complexType name="Product">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Allergen" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Image" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Nutrition" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ProductID" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ProductManufacturer" nillable="true" type="tns:Manufacturer" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Product" nillable="true" type="tns:Product" />
+  <xs:complexType name="Manufacturer">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Latitude" type="xs:double" />
+      <xs:element minOccurs="0" name="Longtitude" type="xs:double" />
+      <xs:element minOccurs="0" name="ManufacturerID" type="ser:guid" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Manufacturer" nillable="true" type="tns:Manufacturer" />
+  <xs:complexType name="ArrayOfProduct">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Product" nillable="true" type="tns:Product" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfProduct" nillable="true" type="tns:ArrayOfProduct" />
+  <xs:complexType name="ArrayOfReview">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Review" nillable="true" type="tns:Review" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfReview" nillable="true" type="tns:ArrayOfReview" />
+  <xs:complexType name="Review">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="FacebookID" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ProductRating" type="xs:int" />
+      <xs:element minOccurs="0" name="ProductReview" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Review" nillable="true" type="tns:Review" />
+</xs:schema>

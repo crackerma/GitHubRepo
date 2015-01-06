@@ -1,0 +1,18 @@
+
+package com.unknow.cpt.history;
+
+import java.util.List;
+
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+/**
+ * @author Mali
+ */
+public interface HistoryManager {
+  public boolean hasItems();
+  public void deleteItem(int ID);
+  public void addItem(Object o);
+  public List<Object> getItems();
+  public Object getItem(int ID);
+}

@@ -1,0 +1,86 @@
+/**
+ * RecentActivity
+ * @author Mali
+ */
+package com.unknow.cpt;
+
+/**
+ * RecentActivity
+ * @author Mali
+ * **/
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import com.unknow.cpt.R;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnCreateContextMenuListener;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
+
+
+public class RecentActivity extends Activity {
+	
+	ArrayList<String> listItem = new ArrayList<String>(); 
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.acvitivy_recent);
+		dataSetup();
+		listViewListenerSetup();
+	}
+	private void dataSetup(){
+		listItem.add("600ml Coca-cola");
+		listItem.add("450ml Coca-cola");
+		listItem.add("600ml Coca-cola");
+		listItem.add("600ml Coca-cola");
+		listItem.add("600ml Coca-cola");
+		listItem.add("600ml Coca-cola");
+		listItem.add("600ml Coca-cola");
+	}
+	private void listViewListenerSetup(){
+		ListView recentList = (ListView) this.findViewById(R.id.recent_view);
+		
+		/*SimpleAdapter listItemAdapter = new SimpleAdapter(
+				this,listItem,R.layout.list_recent,
+				new String[]{"item","Image"}}
+				);*/
+		ArrayAdapter listItemAdapter = new ArrayAdapter(this,R.layout.list_recent,listItem);
+		recentList.setAdapter(listItemAdapter);
+        recentList.setOnItemClickListener(new OnItemClickListener() {  
+      	  
+            @Override  
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,  
+                    long arg3) {  
+                /**ItemClickListener: Action code below*/
+            }  
+        }); 
+        recentList.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {  
+            
+            @Override  
+            public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {  
+                menu.setHeaderTitle("Options");
+                menu.add(0, 0, 0, "DELETE");
+                menu.add(0, 1, 0, "ADD TO FAVOURITE");
+            }
+
+        });
+	}
+    @Override  
+    public boolean onContextItemSelected(MenuItem item) {  
+        setTitle(item.getItemId()+" action performed");   
+        return super.onContextItemSelected(item);  
+    }
+	
+}

@@ -1,0 +1,106 @@
+﻿<phone:PhoneApplicationPage 
+    xmlns:maps="clr-namespace:Microsoft.Phone.Controls.Maps;assembly=Microsoft.Phone.Controls.Maps"  
+    x:Class="CPT.Views.ProductView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
+    xmlns:delay="clr-namespace:Delay;assembly=PhonePerformance"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait"  Orientation="Portrait"
+    shell:SystemTray.IsVisible="True">
+
+    <Grid x:Name="LayoutRoot">
+        <controls:Panorama TitleTemplate="{StaticResource Blank}" Margin="0,-15,0,0">
+            <controls:PanoramaItem Header="general info">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="80" delay:LowProfileImageLoader.UriSource="{Binding CurrentProduct.Image}"></Image>
+                        <TextBlock Margin="10" FontSize="32" Text="{Binding CurrentProduct.Name}"></TextBlock>
+                    </StackPanel>
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Grid.Column="0" Orientation="Vertical">
+                            <TextBlock Text="Nutrition:" FontSize="22"></TextBlock>
+                            <TextBlock Text="{Binding Nutrition}" FontStyle="Italic"></TextBlock>
+                        </StackPanel>
+                        
+                        <StackPanel Grid.Column="1" Orientation="Vertical">
+                            <TextBlock Text="Allergens:" FontSize="22"></TextBlock>
+                            <TextBlock Text="{Binding CurrentProduct.Allergen}" FontStyle="Italic"></TextBlock>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </controls:PanoramaItem>
+
+            <controls:PanoramaItem Header="manufacturer">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    
+                    <StackPanel Grid.Row="0" Orientation="Vertical">
+                        <TextBlock Margin="10" FontSize="40" Text="{Binding CurrentProduct.ProductManufacturer.Name}"></TextBlock>
+                        <TextBlock Text="{Binding CurrentProduct.ProductManufacturer.Description}" FontStyle="Italic" TextWrapping="Wrap"></TextBlock>
+                        <TextBlock Text="Location:" FontSize="22"></TextBlock>
+                    </StackPanel>
+
+                    <maps:Map x:Name="ManufacturerMap" Grid.Row="1" Center="{Binding MapCenter}" IsEnabled="False" CredentialsProvider="AqNFlS9KShh_EW5qnCVuApUJQrLSpGxAnl9lVSAYv2Z_xGzdFPOKXyxnULS1bdrC"></maps:Map>
+                </Grid>
+            </controls:PanoramaItem>
+
+            <controls:PanoramaItem Header="reviews">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="10"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    
+                    <ListBox Grid.Row="0" ItemsSource="{Binding Reviews}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Vertical" Margin="0,0,0,10">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Height="80" delay:LowProfileImageLoader.UriSource="{Binding Image}"></Image>
+                                        <StackPanel Orientation="Vertical" Margin="10,0,0,0">
+                                            <TextBlock Text="{Binding Name}" FontSize="32"></TextBlock>
+                                            <TextBlock FontStyle="Italic" Text="{Binding ProxyReview.ProductReview}" TextWrapping="Wrap"></TextBlock>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <StackPanel Grid.Row="1" Visibility="{Binding AddReviewVisible}">
+                        <TextBlock Text="{Binding AddReviewMessage}" FontSize="22"></TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton x:Name="ReviewRating1" Content="1" IsChecked="True" GroupName="ReviewRating" IsEnabled="{Binding AddReviewEnabled}"></RadioButton>
+                            <RadioButton x:Name="ReviewRating2" Content="2" GroupName="ReviewRating" IsEnabled="{Binding AddReviewEnabled}"></RadioButton>
+                            <RadioButton x:Name="ReviewRating3" Content="3" GroupName="ReviewRating" IsEnabled="{Binding AddReviewEnabled}"></RadioButton>
+                            <RadioButton x:Name="ReviewRating4" Content="4" GroupName="ReviewRating" IsEnabled="{Binding AddReviewEnabled}"></RadioButton>
+                            <RadioButton x:Name="ReviewRating5" Content="5" GroupName="ReviewRating" IsEnabled="{Binding AddReviewEnabled}"></RadioButton>
+                        </StackPanel>
+                        <TextBox x:Name="ReviewText" AcceptsReturn="True" Height="150" IsEnabled="{Binding AddReviewEnabled}"></TextBox>
+                        <Button x:Name="AddReview" Content="Add Review" Click="AddReview_Click" IsEnabled="{Binding AddReviewEnabled}"></Button>
+                    </StackPanel>
+                    
+                    <ProgressBar Grid.Row="2" IsIndeterminate="{Binding IsLoading}"></ProgressBar>
+                </Grid>
+            </controls:PanoramaItem>
+        </controls:Panorama>
+    </Grid>
+</phone:PhoneApplicationPage>

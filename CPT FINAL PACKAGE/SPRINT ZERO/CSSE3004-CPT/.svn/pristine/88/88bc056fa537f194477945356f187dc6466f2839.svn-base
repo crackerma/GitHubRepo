@@ -1,0 +1,46 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
+
+namespace CPT.WebAPI.Contract.Data
+{
+    /// <summary>
+    /// This is the product model and defines the shape of the database table and the file
+    /// </summary>
+    [DataContract]
+    public class Product
+    {
+        [Key]
+        [Required]
+        [DataMember]
+        public string ProductID { get; set; }
+
+        [Required]
+        [DataMember]
+        public string Name { get; set; }
+
+        [Required]
+        [DataMember]
+        public string Nutrition { get; set; }
+
+        [Required]
+        [DataMember]
+        public string Allergen { get; set; }
+
+        [Required]
+        [DataMember]
+        public string Image { get; set; }
+
+        [Required]
+        [ForeignKey("ProductManufacturer")]
+        public Guid ManufacturerID { get; set; }
+
+        [DataMember]
+        public virtual Manufacturer ProductManufacturer { get; set; }
+
+        public virtual ICollection<Review> Reviews { get; set; }
+    }
+}

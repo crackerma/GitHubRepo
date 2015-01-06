@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <TextView xmlns:android="https://schemas.android.com/apk/res/android"
+        xmlns:android1="http://schemas.android.com/apk/res/android"
+        android:id="@+id/ItemTitle"
+        android1:layout_width="match_parent"
+        android1:layout_height="wrap_content"
+        android1:layout_alignParentLeft="true"
+        android1:layout_centerInParent="true"
+        android1:background="@drawable/list_bg"
+        android1:gravity="center_vertical"
+        android1:paddingTop="10dip"
+        android1:paddingBottom="10dip"
+        android1:paddingLeft="12dip"
+        android1:text="TextView01"
+        android1:textColor="#FFFFFF"
+        android1:textSize="15dip" >
+
+    </TextView>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scan_view"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="45dip"
+        android:background="#31B404" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="PRODUCT DETAILS"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:typeface="sans" />
+    </RelativeLayout>
+
+	<LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:orientation="vertical"
+	    android:padding="20dip"
+	    android:id="@+id/container" >
+
+	    <LinearLayout
+	        android:layout_width="fill_parent"
+	        android:layout_height="150dp"
+	        android:orientation="horizontal"
+	        android:id="@+id/scan" >
+
+	        <ImageView
+	            android:id="@+id/imageView1"
+	            android:layout_width="fill_parent"
+	            android:layout_height="140dp"
+	            android:layout_weight="0.53"
+	            android:padding="5dp"
+	            android:background="@drawable/list_view_shape" />
+
+	        <LinearLayout
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:orientation="vertical" >
+
+	            <ImageButton
+	                android:id="@+id/btn_refresh"
+	                android:layout_width="46dip"
+	                android:layout_height="46dip"
+	                android:layout_x="212dip"
+	                android:layout_y="59dip"
+	                android:src="@drawable/productdetails_renew" 
+	                android:background="#00000000"/>
+
+	            <ImageButton
+	                android:id="@+id/btn_delete"
+	                android:layout_width="46dip"
+	                android:layout_height="46dip"
+	                android:layout_x="212dip"
+	                android:layout_y="116dip"
+	                android:src="@drawable/productdetails_recy"
+	                android:background="#00000000" />
+
+	            <ImageButton
+	                android:id="@+id/btn_favourite"
+	                android:layout_width="46dip"
+	                android:layout_height="46dip"
+	                android:layout_x="212dip"
+	                android:layout_y="2dip"
+	                android:src="@drawable/productdetails_start" 
+	                android:background="#00000000"/>
+	        </LinearLayout>
+	    </LinearLayout>
+
+	    <ExpandableListView
+	        android:id="@+id/expandableListView1"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:divider="@android:color/transparent" 
+			android:dividerHeight="5dip">
+
+	    </ExpandableListView>
+	</LinearLayout>
+</LinearLayout>

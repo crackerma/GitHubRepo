@@ -1,0 +1,133 @@
+package com.unknow.cpt.utility;
+/**
+ * FacebookHelper
+ * Handle facebook associate functions
+ * @author Mali
+ * **/
+import java.io.IOException;
+import java.net.MalformedURLException;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
+import android.os.Looper;
+import android.widget.Toast;
+
+import com.facebook.android.DialogError;
+import com.facebook.android.Facebook;
+import com.facebook.android.Facebook.DialogListener;
+import com.facebook.android.FacebookError;
+import com.facebook.android.Util;
+import com.unknow.cpt.MainActivity;
+
+/**Help for Facebook*/
+public class FacebookHelper {
+	private Context c;
+	private Facebook fb;
+	private String facebook_name;
+	private SharedPreferences sp;
+	private Editor edit;
+	private final static String APP_ID_FACEBOOK = "357671844303809";
+	public FacebookHelper(Context c){
+		this.c = c;
+		fb = new Facebook(APP_ID_FACEBOOK);
+		sp = c.getSharedPreferences("FACEBOOK_PREF", c.MODE_PRIVATE);
+		edit = sp.edit();
+		String access_token = sp.getString("access_token", null);
+		long expires = sp.getLong("access_expires", 0);
+		if(access_token != null){
+			fb.setAccessToken(access_token);
+		}
+		if(expires != 0){
+			fb.setAccessExpires(expires);
+		}
+	}
+	/*
+	 * Facebook login function
+	 * Need to check the login status before call this function
+	 */
+	public void login(){
+		fb.authorize((Activity) c, new DialogListener(){
+			@Override
+			public void onCancel() {
+				// TODO Auto-generated method stub
+				Toast.makeText(c, 
+						"onCancel", Toast.LENGTH_SHORT);
+			}
+
+			@Override
+			public void onComplete(Bundle arg0) {
+				// TODO Auto-generated method stub
+				edit.putString("access_token", fb.getAccessToken());
+				edit.putLong("access_expires", fb.getAccessExpires());
+				edit.commit();
+				Runnable r = new Runnable(){  
+					@Override  
+					public void run() {
+						facebook_name = getUserName();
+						edit.putString("facebook_user", facebook_name);
+						edit.commit();
+					}  
+				
+				};
+				new Thread(r).start();
+				edit.commit();
+			}
+
+			@Override
+			public void onError(DialogError arg0) {
+				// TODO Auto-generated method stub
+				Toast.makeText(c, 
+						"Error occured when login", Toast.LENGTH_SHORT);
+			}
+
+			@Override
+			public void onFacebookError(FacebookError arg0) {
+				// TODO Auto-generated method stub
+				Toast.makeText(c, 
+						"Error occured when login", Toast.LENGTH_SHORT);
+			}
+			
+		});
+	}
+	/*
+	 * Logout function
+	 * Need to check the login status before call this function
+	 * 
+	 */
+	public void logout() throws MalformedURLException, IOException{
+		fb.logout(this.c);
+	}
+	public boolean alreadyLogin(){
+		return fb.isSessionValid();
+	}
+	
+	public String getUserName(){
+		JSONObject obj = null;
+		String jsonUser;
+		try {
+			jsonUser = fb.request("me");
+			obj = Util.parseJson(jsonUser);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FacebookError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return obj.optString("name");
+	}
+}

@@ -1,0 +1,8 @@
+Facebook SDK -> com.facebook.android
+Website Ref: http://developers.facebook.com/
+Zxing -> com.google.zxing.client.android and com.google.zxing.client.android.camera
+com.unknow.cpt.SettingActivity
+Website Ref: http://code.google.com/p/zxing/
+
+mapviewballoons:BalloonItemiedOverlay, BalloonOverlayView in com.unknow.cpt.location
+Website Ref: https://github.com/jgilfelt/android-mapviewballoons

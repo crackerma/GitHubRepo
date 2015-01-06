@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<publishData>
+  <publishProfile publishUrl="ftp://cpt.cerdata.sg/" deleteExistingFiles="False" ftpAnonymousLogin="False" ftpPassiveMode="True" msdeploySite="" msdeploySiteID="" msdeployRemoteSitePhysicalPath="" msdeployAllowUntrustedCertificate="False" msdeploySkipExtraFilesOnServer="True" msdeployMarkAsApp="False" profileName="CPT" publishMethod="FTP" replaceMatchingFiles="True" userName="cpt" savePWD="True" userPWD="AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA9mhbVUD0D0C1f71SBqXjlwAAAAACAAAAAAAQZgAAAAEAACAAAADfpD9JpWiyDJ30PDzGcmt4DezXyBIW06w92L6WLkNlagAAAAAOgAAAAAIAACAAAAD5HE/XU5hLl7jjDYUZ++aIc11QnRVW5NkV0elh581owyAAAADWB8PTWfXMa6OPzt9oOGwWzW4n4GIvoaFHo52AJJr0rkAAAADBLyFbj9ioxj9rAok7vOpl3C48fZ0YCyBhEwIBfHUCElWiNiJvN8Xq8KNCrkTbLwCFZfy8X4VOI2klbo/rAuZ3" SelectedForPublish="True">
+    <file relUrl="bin/CPT.WebAPI.Contract.pdb" publishTime="04/15/2012 02:16:03" />
+    <file relUrl="PublicAPI.svc" publishTime="04/06/2012 11:52:03" />
+    <file relUrl="bin/CPT.WebAPI.Contract.dll" publishTime="04/15/2012 02:16:03" />
+    <file relUrl="Web.config" publishTime="04/14/2012 18:45:10" />
+    <file relUrl="bin/CPT.WebAPI.pdb" publishTime="04/15/2012 02:16:04" />
+    <file relUrl="bin/EntityFramework.dll" publishTime="04/06/2012 01:14:53" />
+    <file relUrl="bin/CPT.WebAPI.dll" publishTime="04/15/2012 02:16:04" />
+  </publishProfile>
+</publishData>

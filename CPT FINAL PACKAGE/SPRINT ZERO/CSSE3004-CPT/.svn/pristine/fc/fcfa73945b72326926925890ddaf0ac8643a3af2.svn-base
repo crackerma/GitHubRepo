@@ -1,0 +1,20 @@
+﻿using NUnit.Framework;
+using CPT.WebAPI.Contract;
+
+namespace CPT.WebAPI.Tests
+{
+    [TestFixture]
+    public class ServerUnitTests
+    {
+        /// <summary>
+        /// Unit Test 5: Web Service correctly handles bad client requests
+        /// </summary>
+        [Test]
+        public void BadClientRequest()
+        {
+            PublicService service = new PublicService();
+
+            Assert.IsNull(service.GetProduct("0000000000000"));
+        }
+    }
+}

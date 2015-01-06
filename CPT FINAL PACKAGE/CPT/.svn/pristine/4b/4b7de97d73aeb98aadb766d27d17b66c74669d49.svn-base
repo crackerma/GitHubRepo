@@ -1,0 +1,491 @@
+/**
+ * ScanActivity
+ * @author Mali
+ */
+package com.unknow.cpt;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.unknow.cpt.R;
+import com.unknow.cpt.comments.CommentActivity;
+import com.unknow.cpt.history.FavouriteManager;
+import com.unknow.cpt.history.HistoryManager;
+import com.unknow.cpt.history.RecentManager;
+import com.unknow.cpt.product.Product;
+import com.unknow.cpt.product.ProductHelper;
+import com.unknow.cpt.product.ProductNotFoundException;
+
+import android.app.Activity;
+import android.app.ActivityGroup;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
+import android.view.Window;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnGroupClickListener;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+
+public class ScanActivity extends ActivityGroup {
+	public static Activity scanActivity;
+	public static LinearLayout container;
+	public static String pID;
+	private ExpandableListView list;
+	private List<List<Map<String, String>>> childs;
+	private Button btn_camera;
+	private View scanView;
+	private ProgressDialog myDialog;
+	private Product p;
+	private Handler mHandler;
+	private MyExpandableListViewAdapter adapter;
+	private ArrayList<String> groupList;
+	private ArrayList<ArrayList<String>> childList;
+	private static String contents;
+	private static final int MSG_SUCCESS = 0;//Downloading product data flag
+    private static final int MSG_FAILURE = 1;
+    private static final int MSG_NOTFOUND = 3;
+    private static final int MSG_CONNECTION = 4;
+    
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		scanActivity = this;
+		setContentView(R.layout.activity_scan);
+		container = (LinearLayout) this.findViewById(R.id.container);
+		scanView = this.findViewById(R.id.scan_view);
+		setupLists();
+		pID = "";
+		setupButtonListener();
+		
+		//CaptureActivity start: this changed to onResume()
+		//Otherwise will cause two CaptureActivity at same time;
+		/**Intent intent = new Intent(this,com.google.zxing.client.android.CaptureActivity.class);
+		intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
+		startActivityForResult(intent, 0);**/
+	}
+	
+	
+	/**
+	 * There are three buttons on the page;
+	 * Refresh button: scan again;
+	 * Delete button: delete the product information from history;
+	 * Camera button: start scanning;
+	 */
+	private void setupButtonListener(){
+		ImageButton btn_refresh = (ImageButton) this.findViewById(R.id.btn_refresh);
+		ImageButton btn_delete = (ImageButton) this.findViewById(R.id.btn_delete);
+		ImageButton btn_favourite = (ImageButton) this.findViewById(R.id.btn_favourite);
+		btn_camera = (Button) MainActivity.mainActivity.findViewById(R.id.radio_button2);
+		OnTouchListener myTouchListener = new OnTouchListener(){
+
+			@Override
+			public boolean onTouch(View v, MotionEvent arg1) {
+				// TODO Auto-generated method stub
+	            if(arg1.getAction() == MotionEvent.ACTION_DOWN){       
+	                //Button down
+	            	((ImageButton)v).setBackgroundColor(getResources().getColor(R.color.transparent_green));                            
+	             }else if(arg1.getAction() == MotionEvent.ACTION_UP){       
+	                 //Button up;
+	                 ((ImageButton)v).setBackgroundColor(getResources().getColor(R.color.transparent));  
+	             } 
+				return false;
+			}
+			
+		};
+		
+		
+		btn_camera.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(ScanActivity.this,com.google.zxing.client.android.CaptureActivity.class);
+				intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
+				startActivityForResult(intent, 0);
+			}
+		});
+		btn_refresh.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(ScanActivity.this,com.google.zxing.client.android.CaptureActivity.class);
+				intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
+				startActivityForResult(intent, 0);
+			}
+			
+		});
+		btn_refresh.setOnTouchListener(myTouchListener);
+		btn_delete.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				//Delete product info from recent table;
+				if(p!=null){
+					HistoryManager hm = new RecentManager(ScanActivity.this);
+					if(hm.getItem(p.getProductID()) != null){
+						hm.deleteItem(p.getProductID());
+						Toast.makeText(ScanActivity.this, "Delete from recent!", Toast.LENGTH_LONG).show();
+					}else{
+						Toast.makeText(ScanActivity.this, "Product not exist in recent!", Toast.LENGTH_LONG).show();
+					}
+				}
+			}
+		});
+		btn_delete.setOnTouchListener(myTouchListener);
+		btn_favourite.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// Add product info to favourite table;
+				if(p!=null){
+					HistoryManager hm = new FavouriteManager(ScanActivity.this);
+					if(hm.getItem(p.getProductID()) == null){
+						hm.addItem(p);
+						Toast.makeText(ScanActivity.this, "Added to favourite!", Toast.LENGTH_LONG).show();
+					}else{
+						Toast.makeText(ScanActivity.this, "Product already in favourite!", Toast.LENGTH_LONG).show();
+					}
+				}
+			}
+			
+		});
+		btn_favourite.setOnTouchListener(myTouchListener);
+		
+	}
+	private void setupLists(){
+		list = (ExpandableListView) this.findViewById(R.id.expandableListView1);
+		String[] titles = {"Overall","Energy Use","Water Use","CO2 Footprint Use","Location Use","Rating & Comments"};
+		groupList = new ArrayList<String>();
+		for(String s : titles){
+			groupList.add(s);
+		}
+		childList = new ArrayList<ArrayList<String>>();
+		for(int i=0;i<6;i++){
+			ArrayList<String> s = new ArrayList<String>();
+			s.add(" ");
+			childList.add(s);
+		}
+		adapter = new MyExpandableListViewAdapter(groupList,childList);
+		list.setGroupIndicator(null);
+		list.setAdapter(adapter);
+		list.setOnGroupClickListener(new OnGroupClickListener(){
+
+			@Override
+			public boolean onGroupClick(ExpandableListView arg0, View arg1,
+					int arg2, long arg3) {
+				// TODO Auto-generated method stub
+				if(arg2 == 4){
+					Intent intent = new Intent(ScanActivity.this,LocationActivity.class);
+					intent.putExtra("pID", ScanActivity.this.p.getProductID());
+					startActivity(intent);
+					return true;
+				}
+				if(arg2 == 5){
+					Intent intent = new Intent(ScanActivity.this,CommentActivity.class);
+					intent.putExtra("pID", ScanActivity.this.p.getProductID());
+					startActivity(intent);
+					return true;
+				}
+				return false;
+			}
+			
+		});
+	}
+	
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+
+		super.onStart();
+	}
+	/**
+	 * Should start CaptureActivity to scan barcode;
+	 * Note:Should check if the CaptureActivity exists
+	 * Otherwise, there will be a new CaptureActivity start
+	 * when CaptureActivity.finish is executed.
+	 */
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		
+		if(RecentActivity.selectPID != ""){
+			contents = RecentActivity.selectPID;
+			RecentActivity.selectPID = "";
+			searchProduct();
+		}else if(FavouriteActivity.selectPID != ""){
+			contents = FavouriteActivity.selectPID;
+			FavouriteActivity.selectPID = "";
+			searchProduct();
+		}
+		else{
+			Intent i = new Intent();  
+			i.setClassName(getPackageName(), "com.google.zxing.client.android.CaptureActivity");        
+			if(getPackageManager().resolveActivity(i, 0) == null) {  
+				//There is no CaptureActivity
+				Intent intent = new Intent(this,com.google.zxing.client.android.CaptureActivity.class);
+				intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
+				startActivityForResult(intent, 0);
+			}
+		}
+	}
+	
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		//Remove the btn_camera listener
+		super.onStop();
+	}
+
+	/**
+	 * This is called when get result from com.google.zxing.client.android.CaptureActivity
+	 * resultCode:RESULT_OK indicates got barcode
+	 */
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+               contents = data.getStringExtra("SCAN_RESULT");
+               // Do something with scanned string
+               Toast.makeText(this, "got barcode"+contents, Toast.LENGTH_LONG).show();
+               Log.i("debug", "got barcode");
+               searchProduct();
+            }
+            else{
+        		MainActivity.moveToRecent();
+            }
+         }
+	}
+	
+	private void searchProduct(){
+		Log.d("debug", "Enter Search Product");
+        mHandler = new Handler(){
+     	   public void handleMessage(Message msg){
+     		   switch(msg.what){
+     		   		case MSG_SUCCESS:
+     		   			if(p!=null){
+     		   				//Update UI
+     		   				updateUI();
+     		   				//Add to Recent;
+     		   				HistoryManager hm = new RecentManager(ScanActivity.this);
+     		   				if(hm.getItem(p.getProductID()) == null){
+     		   					hm.addItem(p);
+     		   				}
+     		   			}else{
+     		   				//Cant't find production information; should display flag page;
+     		   				Toast to = Toast.makeText(MainActivity.mainActivity, "Couldn't find product information",
+     		   						Toast.LENGTH_SHORT);
+     		   				to.setGravity(Gravity.CENTER, 0, 0);
+     		   				to.show();
+     		   			}
+     		   			break;
+     		   		case MSG_FAILURE:
+     		   			Toast toast = Toast.makeText(MainActivity.mainActivity, "Couldn't find product information," +
+     		   					" please check your internet connection.", Toast.LENGTH_SHORT);
+     		   			toast.setGravity(Gravity.CENTER, 0, 0);
+     		   			toast.show();
+     		   			MainActivity.moveToRecent();
+     		   			break;
+     		   		case MSG_NOTFOUND:
+     		   			Toast toast1 = Toast.makeText(MainActivity.mainActivity, "Product can not be found!", Toast.LENGTH_SHORT);
+     		   			toast1.setGravity(Gravity.CENTER, 0, 0);
+     		   			toast1.show();
+     		   			MainActivity.moveToRecent();
+     		   			break;
+     		   		case MSG_CONNECTION:
+     		   			Toast toast2 = Toast.makeText(MainActivity.mainActivity, "Failed connect to internet!", Toast.LENGTH_SHORT);
+     		   			toast2.setGravity(Gravity.CENTER, 0, 0);
+     		   			toast2.show();
+     		   			MainActivity.moveToRecent();
+     		   }
+     	   }
+        };
+        myDialog = ProgressDialog.show(ScanActivity.this, "Searching","Please wait...", true);
+        new Thread() {
+     	   public void run() {
+     		   try {
+     			   ProductHelper ph = new ProductHelper();
+     			   p = ph.getProductInfo(contents);
+     			   sleep(3000);
+     			   if(p!=null){
+     				   Log.i("Product Name", p.getProductName());
+     				   mHandler.obtainMessage(MSG_SUCCESS).sendToTarget();
+     				   return;
+     			   }
+     			   
+     			}catch(ProductNotFoundException e){
+     				mHandler.obtainMessage(MSG_NOTFOUND).sendToTarget();
+     				return;
+     			}
+     		   catch (Exception e){
+        				mHandler.obtainMessage(MSG_CONNECTION).sendToTarget();
+        				return;
+     			} finally {
+     				   myDialog.dismiss();
+     			}
+     		  }
+     	   }.start();
+	}
+	
+    private void updateUI(){
+    	childList.clear();
+    	String[] product_info = {p.getProductDescription(),p.getEnergy(),p.getWater(),p.getCO2()," "," "};
+    	for(String s: product_info){
+    		ArrayList<String> childString = new ArrayList<String>();
+    		childString.add(s);
+    		childList.add(childString);
+    	}
+    	adapter.notifyDataSetChanged();
+    	if(p.getBitmap()!=null){
+    		ImageView iv = (ImageView) this.findViewById(R.id.imageView1);
+    		iv.setImageBitmap(p.getBitmap());
+    	}
+    }
+	
+    
+    private class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
+    	private ArrayList<String> groupList;
+    	private ArrayList<ArrayList<String>> childList;
+    	
+    	public MyExpandableListViewAdapter(ArrayList<String> groupList,ArrayList<ArrayList<String>> childList){
+    		this.groupList = groupList;
+    		this.childList = childList;
+    	}
+    	
+
+    	@Override
+    	public Object getChild(int groupPosition, int childPosition) {
+    		// TODO Auto-generated method stub
+    		return childList.get(groupPosition).get(childPosition);
+    	}
+
+    	@Override
+    	public long getChildId(int groupPosition, int childPosition) {
+    		// TODO Auto-generated method stub
+    		return childPosition;
+    	}
+
+    	@Override
+    	public View getChildView(int groupPosition, int childPosition,
+    			boolean isLastChild, View convertView, ViewGroup parent) {
+    		// TODO Auto-generated method stub
+    		TextView tv = null;
+    		if(convertView == null)
+    		{
+    			tv = new TextView(ScanActivity.this);
+    			convertView = tv;
+    		}else{
+    			tv = (TextView) convertView;
+    		}
+    		tv.setText(getChild(groupPosition,childPosition).toString());
+    		tv.setTextColor(getResources().getColor(R.color.encode_view));
+    		tv.setBackgroundColor(getResources().getColor(R.color.dark_grey));
+    		return tv;
+    	}
+
+    	@Override
+    	public int getChildrenCount(int groupPosition) {
+    		// TODO Auto-generated method stub
+    		return childList.get(groupPosition).size();
+    	}
+
+    	@Override
+    	public Object getGroup(int groupPosition) {
+    		// TODO Auto-generated method stub
+
+    		return groupList.get(groupPosition);
+    	}
+
+    	@Override
+    	public int getGroupCount() {
+    		// TODO Auto-generated method stub
+    		return groupList.size();
+    	}
+
+    	@Override
+    	public long getGroupId(int groupPosition) {
+    		// TODO Auto-generated method stub
+    		return groupPosition;
+    	}
+
+    	@Override
+    	public View getGroupView(int groupPosition, boolean isExpanded,
+    			View convertView, ViewGroup parent) {
+    		// TODO Auto-generated method stub
+    		RelativeLayout view = null;
+    		if (convertView == null) {
+    			view = (RelativeLayout) View.inflate(ScanActivity.this, R.layout.list_group_view, null);
+    			convertView = view;
+    			
+            }
+    		else{
+    			view = (RelativeLayout) convertView;
+    		}
+    		TextView tv = (TextView) view.findViewById(R.id.txt_group);
+    		ImageView iv = (ImageView) view.findViewById(R.id.img_arrow);
+            tv.setText(getGroup(groupPosition).toString());
+    		if(groupPosition == 1){
+    			view.setBackgroundResource(R.drawable.group_shape_orange);
+    		}else if(groupPosition == 2){
+    			view.setBackgroundResource(R.drawable.group_shape_blue);
+    		}else if(groupPosition == 3){
+    			view.setBackgroundResource(R.drawable.group_shape_grey);
+    		}else{
+    			view.setBackgroundResource(R.drawable.group_shape_green);
+    		}
+    		if(isExpanded){
+    			iv.setBackgroundResource(R.drawable.productdetails_directionup);
+    		}else{
+    			iv.setBackgroundResource(R.drawable.productdetails_directiondown);
+    		}
+    		if(groupPosition == 4){
+    			iv.setBackgroundResource(R.drawable.productdetails_directionright);
+    		}
+    		if(groupPosition == 5){
+    			iv.setBackgroundResource(R.drawable.productdetails_directionright);
+    		}
+            return view;
+    	}
+
+    	@Override
+    	public boolean hasStableIds() {
+    		// TODO Auto-generated method stub
+    		return true;
+    	}
+
+    	@Override
+    	public boolean isChildSelectable(int groupPosition, int childPosition) {
+    		// TODO Auto-generated method stub
+    		return true;
+    	}
+    	@Override
+    	public void notifyDataSetChanged() {
+    		// TODO Auto-generated method stub
+    		super.notifyDataSetChanged();
+    	}
+
+    }
+
+    
+}

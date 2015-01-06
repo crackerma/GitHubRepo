@@ -1,0 +1,89 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="CPT.Views.Main"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
+    xmlns:delay="clr-namespace:Delay;assembly=PhonePerformance"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="PortraitOrLandscape" Orientation="Portrait"
+    mc:Ignorable="d" d:DesignHeight="696" d:DesignWidth="480"
+    shell:SystemTray.IsVisible="True">
+
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,28">
+            <TextBlock x:Name="ApplicationTitle" Text="CONSUMER PRODUCT TRANSPARENCY" Style="{StaticResource PhoneTextNormalStyle}"/>
+        </StackPanel>
+        
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition Height="10"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0">
+                <Button x:Name="btnScanBarcode" IsEnabled="{Binding CanScanBarcode}" Click="btnScanBarcode_Click">
+                    <Image Source="/Resources/Images/ScanButton.png"></Image>
+                </Button>
+                
+                <controls:Panorama TitleTemplate="{StaticResource Blank}" Margin="0,-20,0,0">
+                    <controls:PanoramaItem Header="recent">
+                        <ListBox ItemsSource="{Binding RecentProducts}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Tap="ProductPanel_Tap">
+                                        <toolkit:ContextMenuService.ContextMenu>
+                                            <toolkit:ContextMenu>
+                                                <toolkit:MenuItem x:Name="btnAddFavourite" Header="add favourite" Click="btnAddFavourite_Click"></toolkit:MenuItem>
+                                            </toolkit:ContextMenu>
+                                        </toolkit:ContextMenuService.ContextMenu>
+                                        <Image Height="50" delay:LowProfileImageLoader.UriSource="{Binding Image}"></Image>
+                                        <TextBlock Margin="10,0,0,0" FontSize="32" Text="{Binding Name}"></TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </controls:PanoramaItem>
+
+                    <controls:PanoramaItem Header="favourites">
+                        <ListBox ItemsSource="{Binding FavouriteProducts}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Tap="ProductPanel_Tap">
+                                        <toolkit:ContextMenuService.ContextMenu>
+                                            <toolkit:ContextMenu>
+                                                <toolkit:MenuItem x:Name="btnRemoveFavourite" Header="remove favourite" Click="btnRemoveFavourite_Click"></toolkit:MenuItem>
+                                            </toolkit:ContextMenu>
+                                        </toolkit:ContextMenuService.ContextMenu>
+                                        <Image Height="50" delay:LowProfileImageLoader.UriSource="{Binding Image}"></Image>
+                                        <TextBlock Margin="10,0,0,0" FontSize="32" Text="{Binding Name}"></TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </controls:PanoramaItem>
+                </controls:Panorama>
+            </StackPanel>
+
+            <ProgressBar Grid.Row="1" IsIndeterminate="{Binding IsLoading}"></ProgressBar>
+        </Grid>
+        
+        <phone:WebBrowser x:Name="FBBrowserLogin" Grid.Row="0" Grid.RowSpan="2" Navigated="FBBrowserLogin_Navigated" IsScriptEnabled="True" Source="{Binding FBLoginURL, Mode=OneWay}" Visibility="{Binding FBBrowserLoginVisibility, Mode=OneWay}" />
+        <phone:WebBrowser x:Name="FBBrowserLogout" Grid.Row="0" Grid.RowSpan="2" Navigated="FBBrowserLogout_Navigated" IsScriptEnabled="True" Source="{Binding FBLogoutURL, Mode=OneWay}" Visibility="{Binding FBBrowserLogoutVisibility, Mode=OneWay}" />
+    </Grid>
+    
+    <phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="False" x:Name="AppBar"></shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>
+</phone:PhoneApplicationPage>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:scrollbars="vertical" >
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="45dip"
+        android:background="#31B404" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="@string/rating_comment"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:typeface="sans" />
+    </RelativeLayout>
+	<LinearLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:layout_margin="20dip"
+	    android:orientation="vertical">
+        <LinearLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="8dip"
+            android:background="@drawable/list_view_shape">
+            <RatingBar
+			    android:id="@+id/rb"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content" />
+
+        </LinearLayout>
+        <LinearLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="200dip"
+            android:background="@drawable/list_view_shape">
+            <EditText
+                android:id="@+id/txt_comment"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:scrollbars="vertical"
+                android:layout_weight="1"
+                android:singleLine="false"
+                android:maxLines="6"
+                android:layout_margin="3dip"
+                android:inputType="text|textMultiLine|textAutoCorrect"
+                android:textColor="#FFFFFF"
+                android:gravity="top"
+                android:background="@color/transparent_background2">
+                <requestFocus />
+            </EditText>
+        </LinearLayout>
+	    
+        <RelativeLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip">
+
+            <Button
+                android:id="@+id/btn_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/rating_comments_clear" />
+
+            <Button
+                android:id="@+id/btn_confirm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/rating_comments_confirm" />
+        </RelativeLayout>
+        <RelativeLayout
+		        android:id="@+id/comment_back"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_marginTop="8dip"
+		        android:clickable="true"
+		        android:focusable="true"
+		        android:background="@drawable/item_back" >
+
+	        <TextView
+		            android:id="@+id/textView2"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentRight="true"
+		            android:layout_centerVertical="true"
+		            android:layout_marginRight="14dp"
+		            android:text="Product Details"
+		            android:textColor="#FFFFFF" />
+	
+	        <ImageView
+		            android:id="@+id/imageView1"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentLeft="true"
+		            android:layout_alignTop="@+id/textView2"
+		            android:layout_centerVertical="true"
+		            android:layout_marginLeft="5dp"
+		            android:src="@drawable/productdetails_directionleft" />
+    	</RelativeLayout>
+    	
+        <RelativeLayout
+		        android:id="@+id/view_comment"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_marginTop="8dip"
+		        android:clickable="true"
+		        android:focusable="true"
+		        android:background="@drawable/item_back" >
+
+	        <TextView
+		            android:id="@+id/textView3"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentLeft="true"
+		            android:layout_centerVertical="true"
+		            android:layout_marginLeft="14dp"
+		            android:text="View Comments"
+		            android:textColor="#FFFFFF" />
+	
+	        <ImageView
+		            android:id="@+id/imageView4"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentRight="true"
+		            android:layout_alignTop="@+id/textView2"
+		            android:layout_centerVertical="true"
+		            android:layout_marginRight="5dp"
+		            android:src="@drawable/productdetails_directionright" />
+    	</RelativeLayout>
+
+	</LinearLayout>
+</LinearLayout>

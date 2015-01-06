@@ -1,0 +1,17 @@
+﻿<configuration>
+    <system.serviceModel>
+        <bindings>
+            <basicHttpBinding>
+                <binding name="BasicHttpBinding_IPublicService" maxBufferSize="2147483647"
+                    maxReceivedMessageSize="2147483647">
+                    <security mode="None" />
+                </binding>
+            </basicHttpBinding>
+        </bindings>
+        <client>
+            <endpoint address="http://cpt.cerdata.sg/PublicAPI.svc" binding="basicHttpBinding"
+                bindingConfiguration="BasicHttpBinding_IPublicService" contract="WebService.IPublicService"
+                name="BasicHttpBinding_IPublicService" />
+        </client>
+    </system.serviceModel>
+</configuration>

@@ -1,0 +1,94 @@
+/**
+ * 
+ */
+package com.unknow.cpt;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import com.unknow.cpt.R;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnCreateContextMenuListener;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
+
+
+public class RecentActivity extends Activity {
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.acvitivy_recent);
+		ListView recentList = (ListView) this.findViewById(R.id.recent_view);
+		ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>(); 
+		HashMap<String,Object> map = new HashMap<String,Object>();
+		map.put("Image", R.drawable.lastimage);
+		map.put("item", "600ml Coca-cola");
+		listItem.add(map);
+		map = new HashMap<String,Object>();
+		map.put("Image", R.drawable.lastimage);
+		map.put("item", "450ml Coca-cola");
+		listItem.add(map);
+		map = new HashMap<String,Object>();
+		map.put("Image", R.drawable.lastimage);
+		map.put("item", "First Blood");
+		listItem.add(map);
+		map = new HashMap<String,Object>();
+		map.put("Image", R.drawable.lastimage);
+		map.put("item", "Double Kill");
+		listItem.add(map);
+		map = new HashMap<String,Object>();
+		map.put("Image", R.drawable.lastimage);
+		map.put("item", "Triple Kill");
+		listItem.add(map);
+		map = new HashMap<String,Object>();
+		map.put("Image", R.drawable.lastimage);
+		map.put("item", "Quadra Kill");
+		listItem.add(map);
+		map = new HashMap<String,Object>();
+		map.put("Image", R.drawable.lastimage);
+		map.put("item", "Legendary");
+		listItem.add(map);
+		SimpleAdapter listItemAdapter = new SimpleAdapter(
+				this,listItem,R.layout.list_recent,
+				new String[]{"item","Image"},
+				new int[]{R.id.ItemTitle,R.id.last}
+				);
+		recentList.setAdapter(listItemAdapter);
+		
+        recentList.setOnItemClickListener(new OnItemClickListener() {  
+      	  
+            @Override  
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,  
+                    long arg3) {  
+                /**ItemClickListener: Action code below*/
+            }  
+        }); 
+        recentList.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {  
+            
+            @Override  
+            public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {  
+                menu.setHeaderTitle("ContextMenu");
+                menu.add(0, 0, 0, "DELETE");  
+                menu.add(0, 1, 0, "ADD TO FAVOURITE");
+            }
+
+        });
+	}
+    @Override  
+    public boolean onContextItemSelected(MenuItem item) {  
+        setTitle(item.getItemId()+" action performed");   
+        return super.onContextItemSelected(item);  
+    }
+	
+}

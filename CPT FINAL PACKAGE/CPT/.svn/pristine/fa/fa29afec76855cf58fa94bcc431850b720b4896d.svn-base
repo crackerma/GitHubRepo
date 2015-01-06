@@ -1,0 +1,88 @@
+package com.unknow.cpt.product;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
+
+public class ProductHelper {
+	
+	public ProductHelper(){
+		
+	}
+	public Product getProductInfo(String productID) throws ProductNotFoundException, ClientProtocolException, IOException, JSONException{
+		Log.i("debug", "entry to getProductInfo");
+		Product p = null;
+		HttpClient client = new DefaultHttpClient();
+		StringBuilder builder = new StringBuilder();
+		JSONObject jsonObject = null;
+		HttpGet get = new HttpGet("http://1.crackerma.sinaapp.com/productInfo.php?p="+productID);
+		Log.i("debug", "After HttpGet");
+		HttpResponse response = client.execute(get);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+        response.getEntity().getContent()));
+        for (String s = reader.readLine(); s != null; s = reader.readLine()) {
+        	builder.append(s);
+        	}
+        Log.i("json_str", builder.toString());
+        jsonObject = new JSONObject(builder.toString());
+        if(jsonObject.get("info").equals("0")){
+        	throw new ProductNotFoundException();
+        }else{
+        	jsonObject = jsonObject.getJSONObject("data");
+        	p = new Product();
+        	p.setProductID(productID);
+        	p.setProductName(jsonObject.getString("productName"));
+        	p.setProductDescription(jsonObject.getString("description"));
+        	p.setProductImg(jsonObject.getString("image"));
+        	p.setSustainability(jsonObject.getString("sustainabilityInformation"));
+        	p.setEnergy(jsonObject.getString("energy"));
+        	p.setWater(jsonObject.getString("water"));
+        	p.setCO2(jsonObject.getString("CO2"));
+        	JSONArray jArray = jsonObject.getJSONArray("allergens");
+        	ArrayList<String> allergens = new ArrayList<String>();
+        	for(int i=0;i<jArray.length();i++){
+        		allergens.add(jArray.getString(i));
+        	}
+        	p.setAllergens(allergens);
+        	p.setManufacturerName(jsonObject.getString("manufacturerName"));
+        	
+        	//Try get product image;
+        	Bitmap bitmap = null;
+            try{
+                URL  url = new URL(p.getProductImg());
+                HttpURLConnection conn  = (HttpURLConnection)url.openConnection();
+                conn.setDoInput(true);
+                conn.connect(); 
+                InputStream inputStream=conn.getInputStream();
+                bitmap = BitmapFactory.decodeStream(inputStream); 
+            } catch (MalformedURLException e1) {
+                e1.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }finally{
+            	p.setBitmap(bitmap);
+            }
+        	
+        }
+		return p;
+	}
+}

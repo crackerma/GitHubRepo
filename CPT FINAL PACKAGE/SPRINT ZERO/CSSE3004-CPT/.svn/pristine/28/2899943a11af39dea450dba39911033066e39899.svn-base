@@ -1,0 +1,27 @@
+<!DOCTYPE html> 
+
+<html lang="en"> 
+    <head> 
+        <meta charset="utf-8" /> 
+        <meta name="initial-scale" content="10.0" />
+        <title>Consumer Product Transparency - Guide</title> 
+        <style type="text/css">
+            body
+            {
+                background-color:Black;
+                color:White;
+            }
+        </style>
+    </head>
+
+    <body>
+        <p>Instructions</p>
+        <ol>
+            <li><p>Press the scan button on the bottom of the screen.</p></li>
+            <li><p>Take a clear picture of the barcode from a short distance.</p></li>
+            <li><p>After accepting the picture you took, the application will scan for a barcode.</p></li>
+            <li><p>Once the application has finished scanning the results will be displayed.</p></li>
+        </ol>
+        <p>Thank you for using Consumer Product Transparency.</p>
+    </body>
+</html>

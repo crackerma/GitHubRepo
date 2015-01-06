@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CPT</string>
+    <string name="main_home"></string>
+    <string name="main_news"></string>
+    <string name="main_my_info"></string>
+    <string name="menu_search"></string>
+    <string name="more"></string>
+</resources>

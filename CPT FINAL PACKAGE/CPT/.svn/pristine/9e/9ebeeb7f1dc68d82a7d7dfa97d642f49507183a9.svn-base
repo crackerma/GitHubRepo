@@ -1,0 +1,176 @@
+package com.unknow.cpt;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.facebook.android.DialogError;
+import com.facebook.android.Facebook;
+import com.facebook.android.Util;
+import com.facebook.android.Facebook.DialogListener;
+import com.facebook.android.FacebookError;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
+import android.provider.CalendarContract.Instances;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.widget.Toast;
+
+public class FacebookActivity extends Activity{
+	private Facebook fb;
+	private SharedPreferences sp;
+	private Editor editor;
+	private AlertDialog.Builder builder;
+	public static FacebookActivity instances;
+	public void onCreate(Bundle savedInstanceState){
+		super.onCreate(savedInstanceState);
+		setTheme(R.style.transparent_activity);
+		sp = MainActivity.sp;
+		editor = sp.edit();
+		fb = MainActivity.fb;
+		instances = this;
+		if(fb.isSessionValid()){
+			//Should logout;
+			Log.i("debug", "should logout");
+			String access_token = sp.getString("ACCESS_TOKEN", null);
+			long access_expires = sp.getLong("ACCESS_EXPIRES", 0);
+			if(access_token!=null){
+				fb.setAccessToken(access_token);
+			}
+			if(access_expires!=0){
+				fb.setAccessExpires(access_expires);
+			}
+			builder = new Builder(FacebookActivity.this);
+			builder.setMessage("Do you want to logout?");
+			builder.setTitle(sp.getString("FACEBOOK_USER", ""));
+			builder.setPositiveButton("YES", new DialogInterface.OnClickListener(){
+				@Override
+				public void onClick(DialogInterface arg0, int arg1) {
+					// TODO Auto-generated method stub
+					Runnable r = new Runnable(){  
+						@Override  
+						public void run() {
+							try {
+								fb.logout(getApplicationContext());
+							} catch (MalformedURLException e) {
+								// TODO Auto-generated catch block
+								Toast.makeText(getApplicationContext(),"Logout failed", Toast.LENGTH_SHORT).show();
+								e.printStackTrace();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								Toast.makeText(getApplicationContext(),"Logout failed", Toast.LENGTH_SHORT).show();
+								e.printStackTrace();
+							}
+						}  
+					
+					};
+					new Thread(r).start();
+					finish();
+				}
+				
+			});
+			builder.setNegativeButton("NO", new DialogInterface.OnClickListener(){
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					finish();
+				}
+				
+			});
+			builder.show();
+		}else{
+			login();
+		}
+	}
+	public void login(){
+		fb.authorize(this, new DialogListener(){
+
+			@Override
+			public void onComplete(Bundle values) {
+				// TODO Auto-generated method stub
+				Toast.makeText(getApplicationContext(),"Login successful", Toast.LENGTH_SHORT).show();
+				editor.putString("ACCESS_TOKEN", fb.getAccessToken());
+				editor.putLong("ACCESS_EXPIRES", fb.getAccessExpires());
+				editor.commit();
+				Runnable r = new Runnable(){  
+					@Override  
+					public void run() {
+						String facebook_name = getUserName();
+						editor.putString("FACEBOOK_USER", facebook_name);
+						editor.commit();
+					}  
+				
+				};
+				new Thread(r).start();
+				editor.commit();
+				finish();
+			}
+
+			@Override
+			public void onFacebookError(FacebookError e) {
+				// TODO Auto-generated method stub
+				Toast.makeText(getApplicationContext(),"Error occured when login", Toast.LENGTH_SHORT).show();
+				finish();
+			}
+
+			@Override
+			public void onError(DialogError e) {
+				// TODO Auto-generated method stub
+				Toast.makeText(getApplicationContext(),"Error occured when login", Toast.LENGTH_SHORT).show();
+				finish();
+			}
+
+			@Override
+			public void onCancel() {
+				// TODO Auto-generated method stub
+				Toast.makeText(getApplicationContext(),"Canceled when login", Toast.LENGTH_SHORT).show();
+				finish();
+			}
+			
+		});
+	}
+	private String getUserName(){
+		JSONObject obj = null;
+		String jsonUser;
+		try {
+			jsonUser = fb.request("me");
+			obj = Util.parseJson(jsonUser);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FacebookError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return obj.optString("name");
+	}
+	@Override
+	protected void onRestart() {
+		// TODO Auto-generated method stub
+		super.onRestart();
+		finish();
+	}
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+}

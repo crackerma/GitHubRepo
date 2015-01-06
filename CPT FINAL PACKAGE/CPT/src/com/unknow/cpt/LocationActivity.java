@@ -1,0 +1,154 @@
+package com.unknow.cpt;
+/**
+ * LocationActivity: Display a googlemap with different location displayed and the route;
+ * Required Param: ProductID.
+ * Depend classes: All in the com.unknow.cpt.locations
+ * @author Mali
+ */
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.http.client.ClientProtocolException;
+import org.json.JSONException;
+
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapActivity;
+import com.google.android.maps.MapView;
+import com.google.android.maps.Overlay;
+import com.google.android.maps.MapController;
+import com.google.android.maps.OverlayItem;
+import com.unknow.cpt.history.HistoryManager;
+import com.unknow.cpt.history.RecentManager;
+import com.unknow.cpt.location.CustomItemizedOverlay;
+import com.unknow.cpt.location.Location;
+import com.unknow.cpt.location.LocationHelper;
+import com.unknow.cpt.location.LocationNotFoundException;
+import com.unknow.cpt.location.LocationOverLays;
+import com.unknow.cpt.location.MyItemizedOverlay;
+import com.unknow.cpt.product.ProductHelper;
+import com.unknow.cpt.product.ProductNotFoundException;
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+public class LocationActivity extends MapActivity{
+	
+	private RelativeLayout btn_back;
+	private Handler mHandler;
+	private ProgressDialog myDialog;
+	private static final int MSG_SUCCESS = 0;//Downloading product location flag
+    private static final int MSG_FAILURE = 1;
+    private static final int MSG_NOTFOUND = 3;
+    private String pID;
+    private MapView mapView;
+    MyItemizedOverlay itemizedOverlay;
+    private LocationOverLays lo;
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_location);
+        overridePendingTransition(android.R.anim.slide_in_left,android.R.anim.slide_out_right);
+        mapView = (MapView) this.findViewById(R.id.map_view);
+        mapView.setBuiltInZoomControls(true);
+        btn_back = (RelativeLayout) this.findViewById(R.id.location_back);
+        btn_back.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				finish();
+				overridePendingTransition(android.R.anim.slide_in_left,android.R.anim.slide_out_right);
+			}
+        	
+        });
+        //Get product ID;
+        pID = this.getIntent().getExtras().getString("pID");
+        setupMap();
+        
+    }
+    
+    
+	@Override
+	protected boolean isRouteDisplayed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	private void setupMap(){
+        mHandler = new Handler(){
+     	   public void handleMessage(Message msg){
+     		   switch(msg.what){
+     		   		//Get Product location information successed. update the googlemapView
+     		   		case MSG_SUCCESS:
+     		   			updateUI();
+     		   			break;
+     		   		case MSG_FAILURE:
+    		   			Toast.makeText(LocationActivity.this, "Couldn't find location information," +
+    		   					" please check your internet connection.", Toast.LENGTH_LONG).show();
+     		   			break;
+     		   		case MSG_NOTFOUND:
+     		   			Toast.makeText(LocationActivity.this, "Location can not be found!", Toast.LENGTH_LONG).show();
+     		   			break;
+     		   }
+     	   }
+        };
+        myDialog = ProgressDialog.show(this, "Searching","Please wait...", true);
+        new Thread() {
+     	   public void run() {
+     		   LocationHelper ph = new LocationHelper();
+     		   try {
+     			   //Call LocationHelper to get the product location information.
+					lo = ph.getProductLocation(pID);
+					sleep(3000);
+					if(lo!=null){
+						mHandler.obtainMessage(MSG_SUCCESS).sendToTarget();
+						return;
+					}
+				} catch (LocationNotFoundException e) {
+					// TODO Auto-generated catch block
+					mHandler.obtainMessage(MSG_NOTFOUND).sendToTarget();
+					e.printStackTrace();
+					return;
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					mHandler.obtainMessage(MSG_FAILURE).sendToTarget();
+					e.printStackTrace();
+					return;
+				}finally{
+					myDialog.dismiss();
+				}
+     	   }
+     	}.start();
+	}
+	/**
+	 * Setup the mapOverlays and display it with production location information.
+	 * Location informations are store in an ArrayList in a correct order.
+	 */
+	private void updateUI(){
+		List<Overlay> mapOverlays = mapView.getOverlays();
+		Drawable drawable = this.getResources().getDrawable(R.drawable.marker);
+		itemizedOverlay = new MyItemizedOverlay(drawable, mapView);
+		ArrayList<Location> locations = this.lo.getLocations();
+		for(int i=0;i<locations.size();i++){
+			GeoPoint point = locations.get(i).getPoint();
+			OverlayItem overlayitem = 
+		             new OverlayItem(point, "",locations.get(i).getDescription());
+			itemizedOverlay.addOverlay(overlayitem);
+			mapOverlays.add(itemizedOverlay);
+			if(i == 0){
+				MapController mapController = mapView.getController();
+				mapController.animateTo(point);
+				mapController.setZoom(6);
+			}
+		}
+	}
+}

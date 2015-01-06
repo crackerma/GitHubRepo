@@ -1,0 +1,71 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data.Entity;
+
+namespace CPT.WebAPI.Contract.Data
+{
+    /// <summary>
+    /// This is the database intializer class for debuging purposes only really, it allows us to add test data.
+    /// </summary>
+    public class Initializer : DropCreateDatabaseIfModelChanges<DataContext>
+    {
+        /// <summary>
+        /// Add test data to the database here.
+        /// </summary>
+        /// <param name="context"></param>
+        protected override void Seed(DataContext context)
+        {
+            Manufacturer CocaColaManufacturer = new Manufacturer()
+            {
+                Name = "The Coca-Cola Company",
+                Description = "The company produces concentrate, which is then sold to licensed Coca-Cola bottlers throughout the world.",
+                Latitude = 33.907561,
+                Longtitude = -84.460265
+            };
+            context.Manufacturers.Add(CocaColaManufacturer);
+            context.SaveChanges();
+
+            Product CocaCola125 = new Product()
+            {
+                ProductID = "9300675001113",
+                Name = "Coca-Cola 1.25 Litres",
+                Nutrition = "Energy=450kJ;Protein=0g;Fat. total=0g;Carbohydrates=27g;Sodium=25mg",
+                Allergen = "None",
+                Image = "http://i.walmartimages.com/i/p/00/04/90/00/05/0004900005537_500X500.jpg",
+                ManufacturerID = CocaColaManufacturer.ManufacturerID,
+                Reviews = new List<Review>() 
+                { 
+                    new Review()
+                    {
+                        FacebookID = "michellewong06",
+                        ProductRating = 5,
+                        ProductReview = "I love coke!"
+                    },
+                    new Review()
+                    {
+                        FacebookID = "1435368878",
+                        ProductRating = 1,
+                        ProductReview = "I hate coke!"
+                    },
+                    new Review()
+                    {
+                        FacebookID = "pukallus",
+                        ProductRating = 3,
+                        ProductReview = "I am indifferent towards coke."
+                    },
+                    new Review()
+                    {
+                        FacebookID = "jeremywwl",
+                        ProductRating = 4,
+                        ProductReview = "Coke is totally boss."
+                    }
+                }
+            };
+            context.Products.Add(CocaCola125);
+            context.SaveChanges();
+            base.Seed(context);
+        }
+    }
+}
